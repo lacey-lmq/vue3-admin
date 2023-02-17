@@ -1,90 +1,119 @@
-<template>
-  <div>
-    <a-switch
-        :checked="theme === 'dark'"
-        checked-children="Dark"
-        un-checked-children="Light"
-        @change="changeTheme"
-    />
-    <br/>
-    <br/>
-    <a-menu
-        v-model:openKeys="openKeys"
-        v-model:selectedKeys="selectedKeys"
-        style="width: 256px"
-        mode="inline"
-        :theme="theme"
-    >
-      <a-menu-item key="1">
-        <template #icon>
-          <MailOutlined/>
-        </template>
-        Navigation One
-      </a-menu-item>
-      <a-menu-item key="2">
-        <template #icon>
-          <CalendarOutlined/>
-        </template>
-        Navigation Two
-      </a-menu-item>
-      <a-sub-menu key="sub1">
-        <template #icon>
-          <AppstoreOutlined/>
-        </template>
-        <template #title>Navigation Three</template>
-        <a-menu-item key="3">Option 3</a-menu-item>
-        <a-menu-item key="4">Option 4</a-menu-item>
-        <a-sub-menu key="sub1-2" title="Submenu">
-          <a-menu-item key="5">Option 5</a-menu-item>
-          <a-menu-item key="6">Option 6</a-menu-item>
-        </a-sub-menu>
-      </a-sub-menu>
-      <a-sub-menu key="sub2">
-        <template #icon>
-          <SettingOutlined/>
-        </template>
-        <template #title>Navigation Four</template>
-        <a-menu-item key="7">Option 7</a-menu-item>
-        <a-menu-item key="8">Option 8</a-menu-item>
-        <a-menu-item key="9">Option 9</a-menu-item>
-        <a-menu-item key="10">Option 10</a-menu-item>
-      </a-sub-menu>
-    </a-menu>
-  </div>
-</template>
-
 <script lang="ts">
-import {defineComponent, reactive, toRefs} from 'vue';
-import {
-  MailOutlined,
-  CalendarOutlined,
-  AppstoreOutlined,
-  SettingOutlined,
-} from '@ant-design/icons-vue';
-import type {MenuTheme} from 'ant-design-vue';
+import {defineComponent, ref, watch} from 'vue';
+
+import { useGlobe } from "../store/globe";
+import { storeToRefs } from "pinia";
 
 export default defineComponent({
-  components: {
-    MailOutlined,
-    CalendarOutlined,
-    AppstoreOutlined,
-    SettingOutlined,
-  },
   setup() {
-    const state = reactive({
-      theme: 'dark' as MenuTheme,
-      selectedKeys: ['1'],
-      openKeys: ['sub1'],
-    });
-    const changeTheme = (checked: boolean) => {
-      state.theme = checked ? 'dark' : 'light';
-    };
+    const store = useGlobe();
+    const { theme } = storeToRefs(store);
 
+
+    const selectedKeys = ref<string[]>(['1']);
+    const openKeys = ref<string[]>(['1']);
+
+    watch(
+        () => openKeys,
+        val => {
+          console.log('openKeys', val);
+        },
+    );
     return {
-      ...toRefs(state),
-      changeTheme,
+      selectedKeys,
+      openKeys,
+
+      theme
     };
   },
 });
 </script>
 
+<template>
+  <div class="slideLeft" :class="'slideLeft_' + theme">
+    <a href="/" class="logo">
+      <img src="../assets/img/dark-logo.png"  v-if="theme == 'dark'">
+      <img src="../assets/img/light-logo.png" v-else>
+    </a>
+
+
+    <a-menu
+        v-model:openKeys="openKeys"
+        v-model:selectedKeys="selectedKeys"
+        :theme="theme"
+    >
+      <a-menu-item key="1">
+        首页
+      </a-menu-item>
+      <a-menu-item key="2">
+        {{$t('menu.首页')}}
+      </a-menu-item>
+    </a-menu>
+  </div>
+</template>
+
+<style lang="scss">
+.slideLeft {
+  width: 230px;
+  height: 100vh;
+  transition: all .3s;
+
+  .logo {
+    width: 100%;
+    height: 88px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+      width: 152px;
+      height: 50px;
+      display: block;
+    }
+  }
+
+  .ant-menu {
+    border: none;
+
+    .ant-menu-item {
+      text-align: center;
+    }
+  }
+
+  .ant-menu-dark {
+    color: #fff;
+    background: #242731;
+
+    .ant-menu-item-selected {
+      background-color: #292E3D !important;
+
+      .ant-menu-title-content {
+        color: #9222E1 !important;
+      }
+    }
+  }
+
+  .ant-menu-light {
+    .ant-menu-item-selected {
+      background-color: #FAF0F7 !important;
+
+      .ant-menu-title-content {
+        color: #9222E1 !important;
+      }
+    }
+
+    .ant-menu-item:hover, .ant-menu-item-active {
+      color: #9222E1 !important;
+    }
+  }
+
+
+  &_dark {
+    background: #242731;
+  }
+
+  &_light {
+    background: #fff;
+  }
+}
+</style>

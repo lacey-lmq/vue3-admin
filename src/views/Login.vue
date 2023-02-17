@@ -40,7 +40,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { defineComponent, reactive } from 'vue';
 import type { UnwrapRef } from 'vue';
 import type { FormProps } from 'ant-design-vue';
-
+import { useRouter } from 'vue-router';
 interface FormState {
   user: string;
   password: string;
@@ -55,8 +55,12 @@ export default defineComponent({
       user: '',
       password: '',
     });
+
+    const router = useRouter();
     const handleFinish: FormProps['onFinish'] = values => {
-      console.log(formState);
+      if (formState.user === "admin" && formState.password === "123") {
+        router.push('/');
+      }
     };
     const handleFinishFailed: FormProps['onFinishFailed'] = errors => {
       console.log(errors);
